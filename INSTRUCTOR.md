@@ -9,11 +9,11 @@ cp .env.example .env
 # Create MongoDB user
 mongosh << 'EOF'
 use admin
-db.createUser({
-  user: "campusfit_user",
-  pwd: "campusfit_password",
-  roles: [{ role: "readWrite", db: "campusfit_db" }]
-})
+  db.createUser({
+    user: "campusfit_user",
+    pwd: "campusfit_password",
+    roles: [{ role: "readWrite", db: "campusfit_db" }]
+  })
 EOF
 
 # Start and test
