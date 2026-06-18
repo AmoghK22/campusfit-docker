@@ -22,7 +22,7 @@ pipeline {
             }
         }
 
-        stage('Build Image') {
+        stage('Build Docker Image') {
             steps {
                 echo "Building Docker image: ${IMAGE_NAME}:${BUILD_NUMBER}"
 
@@ -33,7 +33,7 @@ pipeline {
             }
         }
 
-        stage('Push Image') {
+        stage('Push Docker Image') {
             steps {
                 withCredentials([
                     usernamePassword(
@@ -55,25 +55,22 @@ pipeline {
             }
         }
 
-        stage('Debug Kubernetes') {
-            steps {
-                bat """
-                    echo USERPROFILE=%USERPROFILE%
-                    echo KUBECONFIG=%KUBECONFIG%
-                    whoami
-
-                    kubectl config current-context
-                    kubectl get deployments
-                """
-            }
-        }
-
         stage('Deploy to Kubernetes') {
             steps {
                 bat """
                     kubectl set image deployment/%DEPLOYMENT_NAME% %CONTAINER_NAME%=%IMAGE_NAME%:${BUILD_NUMBER}
 
                     kubectl rollout status deployment/%DEPLOYMENT_NAME%
+                """
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                bat """
+                    kubectl get deployment %DEPLOYMENT_NAME%
+                    kubectl get pods -l app=%DEPLOYMENT_NAME%
+                    kubectl get services
                 """
             }
         }
