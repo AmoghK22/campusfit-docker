@@ -6,9 +6,12 @@ pipeline {
     }
 
     environment {
-        IMAGE_NAME = "amoghk22/campusfit-app"
+        IMAGE_NAME      = "amoghk22/campusfit-app"
         DEPLOYMENT_NAME = "campusfit"
-        CONTAINER_NAME = "campusfit"
+        CONTAINER_NAME  = "campusfit"
+
+        // Kubernetes config for Jenkins (LocalSystem)
+        KUBECONFIG = "C:\\Windows\\System32\\config\\systemprofile\\.kube\\config"
     }
 
     stages {
@@ -55,10 +58,22 @@ pipeline {
         stage('Debug Kubernetes') {
             steps {
                 bat """
-                    kubectl version --client
+                    echo USERPROFILE=%USERPROFILE%
+                    echo KUBECONFIG=%KUBECONFIG%
+                    whoami
+
                     kubectl config current-context
-                    kubectl cluster-info
                     kubectl get deployments
+                """
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                bat """
+                    kubectl set image deployment/%DEPLOYMENT_NAME% %CONTAINER_NAME%=%IMAGE_NAME%:${BUILD_NUMBER}
+
+                    kubectl rollout status deployment/%DEPLOYMENT_NAME%
                 """
             }
         }
