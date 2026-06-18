@@ -19,11 +19,32 @@ pipeline {
                 echo "Building Docker image: amoghk22/campusfit-app:${BUILD_NUMBER}"
 
                 bat """
-                docker build -t amoghk22/campusfit-app:${BUILD_NUMBER} .
-                docker tag amoghk22/campusfit-app:${BUILD_NUMBER} amoghk22/campusfit-app:latest
+                    docker build -t amoghk22/campusfit-app:${BUILD_NUMBER} .
+                    docker tag amoghk22/campusfit-app:${BUILD_NUMBER} amoghk22/campusfit-app:latest
                 """
             }
         }
 
+        stage('Push Image') {
+            steps {
+
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-creds',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )
+                ]) {
+
+                    bat """
+                        echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
+
+                        docker push amoghk22/campusfit-app:${BUILD_NUMBER}
+
+                        docker push amoghk22/campusfit-app:latest
+                    """
+                }
+            }
+        }
     }
 }
