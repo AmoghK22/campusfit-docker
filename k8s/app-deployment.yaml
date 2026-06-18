@@ -19,4 +19,4 @@ spec:
     spec:
       containers:
       - name: campusfit
-        image: amoghk22/campusfit-app:1.0
+        image: amoghk22/campusfit-app:latest

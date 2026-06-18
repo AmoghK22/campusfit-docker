@@ -4,6 +4,9 @@ node_modules/
 # Environment Variables
 .env
 
+# Kubernetes Secrets
+k8s/mongodb-secret.yaml
+
 # Logs
 logs/
 *.log
